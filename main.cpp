@@ -45,11 +45,11 @@ int main(int argc, char *argv[])
 		
 		//conversion from text to number values
 		Pixel p; //store in p of type pixel
-		p.x = std::stoi(x_text); //convert x and y to ints
-		p.y = std::stoi(y_text); //
-		p.r = std::stof(r_text); //convert R B G to doubles or floats.
-		p.g = std::stof(g_text);
-		p.b = std::stof(b_text);
+		p.x = std::stoi(x_chunk); //convert x and y to ints
+		p.y = std::stoi(y_chunk); //
+		p.r = std::stof(r_chunk); //convert R B G to doubles or floats.
+		p.g = std::stof(g_chunk);
+		p.b = std::stof(b_chunk);
 
 		pixel_list.push_back(p); //adds each pixel (basically a completed struct with pixel's data) to pixel list.
 	}
@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
 	int count = pixel_list.size(); //pre-loop size counter
 	for(int i = 0; i < count; i++) 
 	{
-		outfile << pixel_list[i].x << "," << pixel_list[i].y << "," << pixel_list[i].r << "," << pixel_list[i].g << "," << pixel_list[i].b << "\n"; //writing flipped.dat using now-modified pixel.dat data. 
+		outfile << pixel_list[i].x << "," << pixel_list[i].y << "," << pixel_list[i].r << "," << pixel_list[i].g << "," << pixel_list[i].b << "\n"; //writing flipped.dat using now-modified pixel.dat data. This is also where we add all of the commas back in, though it's much easier because all we need to do is insert one in between each data field. 
 	}
-	outfile.close(); 
+	outfile.close(); //close file. don't have to really, program end will also close the file. unless there's some other reason I don't know about?
 	std::cout << "Flipped.dat created.\n"; //verification prompt. 
 
 	return 0;
@@ -96,24 +96,26 @@ void average_colors(std::vector<Pixel> &pixel_list) //vector of type PIXEL, taki
 	}
 
 	std::cout << "Avg r-value: " << total_r/count << "\n"; //each field sum divided by number of indices in pixel_list
-	std::cout << "Avg g-value: " << total_g/count << "\n"; //
-	std::cout << "Avg b-value: " << total_b/count << "\n"; //
+	std::cout << "Avg g-value: " << total_g/count << "\n"; 
+	std::cout << "Avg b-value: " << total_b/count << "\n"; 
 }
 
 void flip_vertical(std::vector<Pixel> &pixel_list)
 {
-	std::vector<Pixel> original = pixel_list; //copy list before manipulating. from here, flip_vertical reads from the copy of original and writes to flipped.dat. 
+	std::vector<Pixel> original = pixel_list; //copy list before manipulating. from here, flip_vertical reads from the copy of original while it overwrites pixel_list permanently, which main then loops through to write flipped.dat.  
 	int count = pixel_list.size();
 
-	for(int i = 0; i < count; i++)
+	for(int i = 0; i < count; i++) //for loop sandwhiches pixel list from top to bottom. x stays the same, but y flips from the outside-in. vv
+				       //													--
+				       //													^^
 	{
 		int x = pixel_list[i].x;
 		int y = pixel_list[i].y;
 
-		int swap_y = 255 - y; //image has 256 rows, indexed from 0 to 255. 
-		int swap_index = x * 256 + swap_y;
+		int swap_y = 255 - y; //image has 256 rows, indexed from 0 to 255. starting from max length and subtracting by increments of 1, 1 per loop.
+		int swap_index = x * 256 + swap_y; //this gets big fast, but there are over a hundred thousand pixels to write, so it makes sense. 
 
-		pixel_list[i].r = original[swap_index].r;
+		pixel_list[i].r = original[swap_index].r; //x and y are arbitrary. They're positions, not data. R G B are the values that truly get moved around/flipped. 
 		pixel_list[i].g = original[swap_index].g;
 		pixel_list[i].b = original[swap_index].b;
 	}
