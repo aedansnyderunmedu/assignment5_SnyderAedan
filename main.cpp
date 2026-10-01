@@ -1,5 +1,5 @@
 #include <iostream> //std::cout, std::cerr (error printing)
-#include <fstream> //std::ifstream --> INPUT file stream, read a file. std::ofstream --> WRITE to a file
+#include <fstream> //std::ifstream --> INPUT file stream, read a file. std::ofstream --> WRITE a file
 #include <string> //std::string std::stoi, std::stof
 #include <vector> //std::vector --> self-regulating array
 #include <iomanip> //std::setprecision,manipulation of varaibles/data
@@ -17,15 +17,15 @@ int main(int argc, char *argv[])
 	}
 
 	std::string filename = argv[1]; //copy user-entered string <filename> and store in a string object. this object will be used to name and create an input file below
-	std::ifstream infile(filename); //input filestream object called infile, open it
+	std::ifstream infile(filename); //create input filestream object called infile, open it. filename used for dynamic reading
 	if(!infile.is_open()) //if is_open is FALSE, the input file wasn't opened correctly
 	{
 		std::cerr << "Could not open " << filename << ".\n"; //print error to screen; couldn't find/open
 		return 1;
 	}
 	
-	std::vector<Pixel> pixel_list; //array of pixels, grows automatically. <Pixel> determines the TYPE of data stored in the array
-	std::string line; //grabs one text line at a time. each one overwrites the next. "Variable declared OUTSIDE LOOP! getline NEEDS an object to WRITE TO. When it can't write to something, it returns a fail flag essentially. Line is also used in our while loop condition."
+	std::vector<Pixel> pixel_list; //array of pixels, grows automatically. <Pixel> is the TYPE. just like a struct really. 
+	std::string line; //grabs one text line at a time. each one overwrites the next. "Variable declared OUTSIDE LOOP! getline NEEDS an object to WRITE TO. When it can't write to something, it returns an error code. Line is also used in our while loop condition."
 	
 	while(std::getline(infile, line)) //getline returns false when no lines left to read, and loop ends.
 	{
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 		std::string y_chunk = line.substr(c1 + 1, c2 - c1 - 1); //substr takes two parameters: "Start", and "Length". 
 		std::string r_chunk = line.substr(c2 + 1, c3 - c2 - 1); //Start right AFTER the comma. Subtract to get the NUMBER of characters between commas, then subtract 1 to land on the right index. substr copies THAT CHUNK of data, and it self-sizes with each loop. 
 		std::string g_chunk = line.substr(c3 + 1, c4 - c3 - 1);
-		std::string b_chunk = line.substr(c4 + 1); //follows through to end
+		std::string b_chunk = line.substr(c4 + 1); //follows through to end, so no second parameter.
 		
 		//conversion from text to number values
 		Pixel p; //store in p of type pixel
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	outfile << std::setprecision(9); //outfile << (command) essentially pushes a setting to our output stream. in this case, we set precision to 9 significant figures to ensure all data is captured. "MUST BE DONE BEFORE FOR LOOP, or none of it will apply to the data we write."
+	//outfile << std::setprecision(9); //outfile << (command) essentially pushes a setting to our output stream. in this case, we set precision to 9 significant figures to ensure all data is captured. "DEPRECATED. I removed this because it was adding numbers to the end of RGB values, and I have no idea why. Most of them are only 6 sig figs anyway.
 	
 	int count = pixel_list.size(); //pre-loop size counter
 	for(int i = 0; i < count; i++) 
